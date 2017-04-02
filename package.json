@@ -1,17 +1,40 @@
 {
-    "buildNpmdoc":"time-grunt",
+    "author": "kai zhu <kaizhu256@gmail.com>",
+    "buildNpmdoc": "time-grunt",
+    "description": "api documentation for [time-grunt (v1.4.0)](https://github.com/sindresorhus/time-grunt#readme) [![npm package](https://img.shields.io/npm/v/npmdoc-time-grunt.svg?style=flat-square)](https://www.npmjs.org/package/npmdoc-time-grunt) [![travis-ci.org build-status](https://api.travis-ci.org/npmdoc/node-npmdoc-time-grunt.svg)](https://travis-ci.org/npmdoc/node-npmdoc-time-grunt)",
     "devDependencies": {
-        "time-grunt": "*",
         "electron-lite": "kaizhu256/node-electron-lite#alpha",
+        "time-grunt": "*",
         "utility2": "kaizhu256/node-utility2#alpha"
     },
-    "name":"npmdoc-time-grunt",
+    "engines": {
+        "node": ">=4.0"
+    },
+    "homepage": "https://github.com/npmdoc/node-npmdoc-time-grunt",
+    "keywords": [
+        "documentation",
+        "time-grunt"
+    ],
+    "license": "MIT",
+    "main": "lib.npmdoc_time_grunt.js",
+    "name": "npmdoc-time-grunt",
+    "nameAlias": "npmdoc_time_grunt",
+    "nameOriginal": "npmdoc-time-grunt",
+    "os": [
+        "darwin",
+        "linux"
+    ],
     "repository": {
         "type": "git",
         "url": "https://github.com/npmdoc/node-npmdoc-time-grunt.git"
     },
     "scripts": {
-        "build-ci": "utility2 shReadmeTest build_ci.sh"
+        "build-ci": "utility2 shReadmeTest build_ci.sh",
+        "env": "env",
+        "heroku-postbuild": "(set -e; npm install \"kaizhu256/node-utility2#alpha\"; utility2 shDeployHeroku)",
+        "postinstall": "if [ -f npm_scripts.sh ]; then ./npm_scripts.sh postinstall; fi",
+        "start": "(set -e; export PORT=${PORT:-8080}; utility2 start test.js)",
+        "test": "(set -e; export PORT=$(utility2 shServerPortRandom); utility2 test test.js)"
     },
     "version": "0.0.1"
 }
