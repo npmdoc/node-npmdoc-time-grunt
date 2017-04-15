@@ -61,12 +61,218 @@
 
     <li class="apidocModuleLi"><a href="#apidoc.module.time-grunt">module time-grunt</a><ol>
 
+        <li>
+
+            <a class="apidocElementLiA" href="#apidoc.element.time-grunt.time-grunt">
+            function <span class="apidocSignatureSpan"></span>time-grunt
+            <span class="apidocSignatureSpan">(grunt, cb)</span>
+            </a>
+
+        </li>
+
+        <li>
+
+            <a class="apidocElementLiA" href="#apidoc.element.time-grunt.toString">
+            function <span class="apidocSignatureSpan">time-grunt.</span>toString
+            <span class="apidocSignatureSpan">()</span>
+            </a>
+
+        </li>
+
     </ol></li>
 
 </ol></div>
 
 <div class="apidocSectionDiv">
 <h1><a href="#apidoc.module.time-grunt" id="apidoc.module.time-grunt">module time-grunt</a></h1>
+
+
+    <h2>
+        <a href="#apidoc.element.time-grunt.time-grunt" id="apidoc.element.time-grunt.time-grunt">
+        function <span class="apidocSignatureSpan"></span>time-grunt
+        <span class="apidocSignatureSpan">(grunt, cb)</span>
+        </a>
+    </h2>
+    <ul>
+    <li>description and source-code<pre class="apidocCodePre">time-grunt = function (grunt, cb) {
+	var now = new Date();
+	var startTimePretty = dateTime(new Date(), {local: true});
+	var startTime = now.getTime();
+	var prevTime = startTime;
+	var prevTaskName = &#x27;loading tasks&#x27;;
+	var tableData = [];
+
+	if (argv.indexOf(&#x27;--help&#x27;) !== -1 ||
+		argv.indexOf(&#x27;-h&#x27;) !== -1 ||
+		// for `quiet-grunt`
+		argv.indexOf(&#x27;--quiet&#x27;) !== -1 ||
+		argv.indexOf(&#x27;-q&#x27;) !== -1 ||
+		argv.indexOf(&#x27;--version&#x27;) !== -1 ||
+		argv.indexOf(&#x27;-V&#x27;) !== -1) {
+		return;
+	}
+
+	// crazy hack to work around stupid node-exit
+	// Can this be removed now that node-exit#4 has been resolved?
+	// https://github.com/cowboy/node-exit/issues/4
+	var originalExit = process.exit;
+
+	var interval;
+
+	var exit = function (exitCode) {
+		clearInterval(interval);
+		process.emit(&#x27;timegruntexit&#x27;, exitCode);
+		exit = function () {};
+	};
+
+	interval = setInterval(function () {
+		process.exit = exit;
+	}, 100);
+
+	process.exit = exit;
+
+	hooker.hook(grunt.log, &#x27;header&#x27;, function () {
+		var name = grunt.task.current.nameArgs;
+		var diff = Date.now() - prevTime;
+
+		if (prevTaskName &#x26;&#x26; prevTaskName !== name) {
+			tableData.push([prevTaskName, diff]);
+		}
+
+		prevTime = Date.now();
+		prevTaskName = name;
+	});
+
+	function formatTable(tableData) {
+		var totalTime = Date.now() - startTime;
+		var longestTaskName = tableData.reduce(function (acc, row) {
+			var avg = row[1] / totalTime;
+
+			if (avg &#x3c; 0.01 &#x26;&#x26; !grunt.option(&#x27;verbose&#x27;)) {
+				return acc;
+			}
+
+			return Math.max(acc, row[0].length);
+		}, 0);
+
+		var maxColumns = process.stdout.columns || 80;
+		var maxBarWidth;
+
+		if (longestTaskName &#x3e; maxColumns / 2) {
+			maxBarWidth = (maxColumns - 20) / 2;
+		} else {
+			maxBarWidth = maxColumns - (longestTaskName + 20);
+		}
+		maxBarWidth = Math.max(0, maxBarWidth);
+
+		function shorten(taskName) {
+			var nameLength = taskName.length;
+
+			if (nameLength &#x3c;= maxBarWidth) {
+				return taskName;
+			}
+
+			var partLength = Math.floor((maxBarWidth - 3) / 2);
+			var start = taskName.substr(0, partLength + 1);
+			var end = taskName.substr(nameLength - partLength);
+
+			return start.trim() + &#x27;...&#x27; + end.trim();
+		}
+
+		function createBar(percentage) {
+			var rounded = Math.round(percentage * 100);
+
+			if (rounded === 0) {
+				return &#x27;0%&#x27;;
+			}
+
+			var barLength = Math.ceil(maxBarWidth * percentage) + 1;
+			var bar = new Array(barLength).join(barChar);
+
+			return bar + &#x27; &#x27; + rounded + &#x27;%&#x27;;
+		}
+
+		var tableDataProcessed = tableData.map(function (row) {
+			var avg = row[1] / totalTime;
+
+			// hide the watch task
+			if (!grunt.option(&#x27;verbose&#x27;) &#x26;&#x26; /^watch($|:)/.test(row[0])) {
+				return null;
+			}
+
+			if (numberIsNan(avg) || (avg &#x3c; 0.01 &#x26;&#x26; !grunt.option(&#x27;verbose&#x27;))) {
+				return null;
+			}
+
+			return [shorten(row[0]), chalk.blue(prettyMs(row[1])), chalk.blue(createBar(avg))];
+		}).reduce(function (acc, row) {
+			if (row) {
+				acc.push(row);
+				return acc;
+			}
+
+			return acc;
+		}, []);
+
+		tableDataProcessed.push([chalk.magenta(&#x27;Total&#x27;, prettyMs(totalTime))]);
+
+		return table(tableDataProcessed, {
+			align: [&#x27;l&#x27;, &#x27;r&#x27;, &#x27;l&#x27;],
+			stringLength: function (str) {
+				return chalk.stripColor(str).length;
+			}
+		});
+	}
+
+	process.on(&#x27;SIGINT&#x27;, function () {
+		process.exit();
+	});
+
+	process.once(&#x27;timegruntexit&#x27;, function (exitCode) {
+		clearInterval(interval);
+
+		process.exit = originalExit;
+		hooker.unhook(grunt.log, &#x27;header&#x27;);
+
+		var diff = Date.now() - prevTime;
+
+		if (prevTaskName) {
+			tableData.push([prevTaskName, diff]);
+		}
+
+		// `grunt.log.header` should be unhooked above, but in some cases it&#x27;s not
+		log(&#x27;\n\n&#x27; + chalk.underline(&#x27;Execution Time&#x27;) + chalk.gray(&#x27; (&#x27; + startTimePretty + &#x27;)&#x27;));
+		log(formatTable(tableData) + &#x27;\n&#x27;);
+
+		if (cb) {
+			cb(tableData, function () {
+				process.exit(exitCode);
+			});
+
+			return;
+		}
+
+		process.exit(exitCode);
+	});
+}</pre></li>
+    <li>example usage<pre class="apidocCodePre">n/a</pre></li>
+    </ul>
+
+
+
+    <h2>
+        <a href="#apidoc.element.time-grunt.toString" id="apidoc.element.time-grunt.toString">
+        function <span class="apidocSignatureSpan">time-grunt.</span>toString
+        <span class="apidocSignatureSpan">()</span>
+        </a>
+    </h2>
+    <ul>
+    <li>description and source-code<pre class="apidocCodePre">toString = function () {
+    return toString;
+}</pre></li>
+    <li>example usage<pre class="apidocCodePre">n/a</pre></li>
+    </ul>
+
 
 </div>
 
