@@ -1,6 +1,6 @@
 # npmdoc-time-grunt
 
-#### api documentation for  time-grunt (v1.4.0)  [![npm package](https://img.shields.io/npm/v/npmdoc-time-grunt.svg?style=flat-square)](https://www.npmjs.org/package/npmdoc-time-grunt) [![travis-ci.org build-status](https://api.travis-ci.org/npmdoc/node-npmdoc-time-grunt.svg)](https://travis-ci.org/npmdoc/node-npmdoc-time-grunt)
+#### basic api documentation for  [time-grunt (v1.4.0)](https://github.com/sindresorhus/time-grunt#readme)  [![npm package](https://img.shields.io/npm/v/npmdoc-time-grunt.svg?style=flat-square)](https://www.npmjs.org/package/npmdoc-time-grunt) [![travis-ci.org build-status](https://api.travis-ci.org/npmdoc/node-npmdoc-time-grunt.svg)](https://travis-ci.org/npmdoc/node-npmdoc-time-grunt)
 
 #### Display the elapsed execution time of grunt tasks
 
@@ -21,9 +21,41 @@
 ```json
 
 {
-    "name": "time-grunt",
-    "version": "1.4.0",
+    "author": {
+        "name": "Sindre Sorhus",
+        "url": "sindresorhus.com"
+    },
+    "bugs": {
+        "url": "https://github.com/sindresorhus/time-grunt/issues"
+    },
+    "dependencies": {
+        "chalk": "^1.0.0",
+        "date-time": "^1.1.0",
+        "figures": "^1.0.0",
+        "hooker": "^0.2.3",
+        "number-is-nan": "^1.0.0",
+        "pretty-ms": "^2.1.0",
+        "text-table": "^0.2.0"
+    },
     "description": "Display the elapsed execution time of grunt tasks",
+    "devDependencies": {
+        "grunt": "^1.0.1",
+        "grunt-cli": "^1.2.0",
+        "xo": "*"
+    },
+    "directories": {},
+    "dist": {
+        "shasum": "062213e660c907e86f440556c01ea6597b712420",
+        "tarball": "https://registry.npmjs.org/time-grunt/-/time-grunt-1.4.0.tgz"
+    },
+    "engines": {
+        "node": ">=0.10.0"
+    },
+    "files": [
+        "index.js"
+    ],
+    "gitHead": "29dc47d8e5fd3074b5867fad48f1d644afb480ae",
+    "homepage": "https://github.com/sindresorhus/time-grunt#readme",
     "keywords": [
         "grunt",
         "tasks",
@@ -37,39 +69,27 @@
         "tasks"
     ],
     "license": "MIT",
-    "author": {
-        "name": "Sindre Sorhus",
-        "url": "sindresorhus.com"
-    },
-    "files": [
-        "index.js"
+    "maintainers": [
+        {
+            "name": "sindresorhus"
+        }
     ],
-    "repository": "sindresorhus/time-grunt",
+    "name": "time-grunt",
+    "optionalDependencies": {},
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/sindresorhus/time-grunt.git"
+    },
     "scripts": {
         "test": "xo && grunt && grunt sigint"
     },
-    "engines": {
-        "node": ">=0.10.0"
-    },
+    "version": "1.4.0",
     "xo": {
         "rules": {
             "xo/no-process-exit": 0
         }
     },
-    "dependencies": {
-        "chalk": "^1.0.0",
-        "date-time": "^1.1.0",
-        "figures": "^1.0.0",
-        "hooker": "^0.2.3",
-        "number-is-nan": "^1.0.0",
-        "pretty-ms": "^2.1.0",
-        "text-table": "^0.2.0"
-    },
-    "devDependencies": {
-        "grunt": "^1.0.1",
-        "grunt-cli": "^1.2.0",
-        "xo": "*"
-    }
+    "bin": {}
 }
 ```
 
